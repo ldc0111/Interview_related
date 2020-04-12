@@ -1,23 +1,57 @@
 #include <bits/stdc++.h>
-#include <cmath>
 using namespace std;
-const int N = 1000000;
-int dp[N + 5];
+
 int main() {
-    int n;
-    cin>> n;
-    cout << pow(64,1/3) << endl;
-    //有一个结论要证明，是２７　＋ 7 = 34 8个;  4 ×　８　＋ 2 =34  6个；
-    //dp[i]  i值组成的最小立方数个数
-    dp[1] = 1;
-    for (int i = 2;i <= n; i++) {
-        int d = pow((double)i,(double)1/3);
-        cout << i << " " << d << endl;
-        dp[i] = dp[i - 1] + 1;
-        for (int j = 2; j <= d; j++) {
-            dp[i] = min(dp[i - j * j *j] + 1,dp[i]);
+    vector<int> A;
+    unordered_map<int,int> mp;
+    map<int,int> ans;
+    unordered_map<int,int> temp;
+    int n,tmp,cnt = 0,len = INT_MAX,X = 0;
+    scanf("%d",&n);
+    //cin >> n;
+    A.push_back(0);
+    for (int i = 1; i <= n; i++) {
+        scanf("%d",&tmp);
+        //cin >> tmp;
+        A.push_back(tmp);
+        mp[tmp] = 1;
+    }
+    queue<int> q;
+    cnt = mp.size();
+    if (cnt == 1) {
+        printf("1 %d\n",A.size() - 1);
+        for (int i = 1; i <= A.size(); i++) {
+            printf("[%d,%d] ",i,i);
+        }
+        printf("\n");
+        return 0;
+    }
+    for (int i = 1; i < A.size(); i++) {
+        //统计当前区间内的元素个数
+        if (i + 1 < A.size() && A[i] == A[i + 1]) continue;
+        temp[A[i]] += 1;
+        //cout << i << " " << temp.size() << endl;
+        q.push(i);//统计区间
+        if(temp.size() == cnt) {
+            //统计区间
+            int val = i;
+            while(val >= 1 && A[val] == A[val-1]) val-=1;
+            while(temp.size() == cnt) {
+                int key = q.front();
+                q.pop();
+                ans[key] = val;
+                temp[A[key]] -= 1;
+                if (temp[A[key]] <= 0) temp.erase(A[key]);
+                if (val-key < len) len = val-key,X = 1;
+                else if (val-key == len) X++;
+            }
         }
     }
-    cout << dp[n] << endl;
+    printf("%d %d\n",len + 1,X);
+    for (auto x: ans) {
+        if (x.second-x.first == len)
+        printf("[%d,%d] ",x.first,x.second);
+    }
+    cout << endl;
     return 0;
 }
